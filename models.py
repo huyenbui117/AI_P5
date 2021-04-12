@@ -1,5 +1,6 @@
 import nn
 
+
 class PerceptronModel(object):
     def __init__(self, dimensions):
         """
@@ -62,9 +63,16 @@ class RegressionModel(object):
     numbers to real numbers. The network should be sufficiently large to be able
     to approximate sin(x) on the interval [-2pi, 2pi] to reasonable precision.
     """
+
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
+        self.w1 = nn.Parameter(1, 100)
+        self.b1 = nn.Parameter(1, 100)
+        self.w2 = nn.Parameter(100, 1)
+        self.b2 = nn.Parameter(1, 1)
+        self.learning_rate = 0.05
+        self.batch_size = 50
 
     def run(self, x):
         """
@@ -76,6 +84,11 @@ class RegressionModel(object):
             A node with shape (batch_size x 1) containing predicted y-values
         """
         "*** YOUR CODE HERE ***"
+        xw1 = nn.Linear(x, self.w1)
+        res1 = nn.ReLU(nn.AddBias(xw1, self.b1))
+        xw2 = nn.Linear(res1, self.w2)
+        res2 = nn.AddBias(xw2, self.b2)
+        return res2
 
     def get_loss(self, x, y):
         """
@@ -88,12 +101,22 @@ class RegressionModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        return nn.SquareLoss(self.run(x), y)
 
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+        while nn.as_scalar(self.get_loss(nn.Constant(dataset.x), nn.Constant(dataset.y))) > 0.01:
+            for x, y in dataset.iterate_once(self.batch_size):
+                loss = self.get_loss(x, y)
+                grad = nn.gradients(loss, [self.w1, self.w2, self.b1, self.b2])
+                self.w1.update(grad[0], -self.learning_rate)
+                self.w2.update(grad[1], -self.learning_rate)
+                self.b1.update(grad[2], -self.learning_rate)
+                self.b2.update(grad[3], -self.learning_rate)
+
 
 class DigitClassificationModel(object):
     """
@@ -109,6 +132,7 @@ class DigitClassificationModel(object):
     methods here. We recommend that you implement the RegressionModel before
     working on this part of the project.)
     """
+
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
@@ -150,6 +174,7 @@ class DigitClassificationModel(object):
         """
         "*** YOUR CODE HERE ***"
 
+
 class LanguageIDModel(object):
     """
     A model for language identification at a single-word granularity.
@@ -158,6 +183,7 @@ class LanguageIDModel(object):
     methods here. We recommend that you implement the RegressionModel before
     working on this part of the project.)
     """
+
     def __init__(self):
         # Our dataset contains words from five different languages, and the
         # combined alphabets of the five languages contain a total of 47 unique
