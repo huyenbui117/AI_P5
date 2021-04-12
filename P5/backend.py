@@ -2,6 +2,7 @@ import collections
 import os
 import time
 import os
+from turtle import delay
 
 import matplotlib.pyplot as plt
 import numpy as np
