@@ -108,7 +108,7 @@ class RegressionModel(object):
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
-        while nn.as_scalar(self.get_loss(nn.Constant(dataset.x), nn.Constant(dataset.y))) > 0.01:
+        while nn.as_scalar(self.get_loss(nn.Constant(dataset.x), nn.Constant(dataset.y))) > 0.02:
             for x, y in dataset.iterate_once(self.batch_size):
                 loss = self.get_loss(x, y)
                 grad = nn.gradients(loss, [self.w1, self.w2, self.b1, self.b2])
@@ -136,6 +136,14 @@ class DigitClassificationModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
+        self.w1 = nn.Parameter(784, 100)
+        self.b1 = nn.Parameter(1, 100)
+        self.w2 = nn.Parameter(100, 100)
+        self.b2 = nn.Parameter(1, 100)
+        self.w3 = nn.Parameter(100, 10)
+        self.b3 = nn.Parameter(1, 10)
+        self.learning_rate = 0.05
+        self.batch_size = 50
 
     def run(self, x):
         """
@@ -152,6 +160,13 @@ class DigitClassificationModel(object):
                 (also called logits)
         """
         "*** YOUR CODE HERE ***"
+        xw1 = nn.Linear(x, self.w1)
+        res1 = nn.ReLU(nn.AddBias(xw1, self.b1))
+        xw2 = nn.Linear(res1, self.w2)
+        res2 = nn.AddBias(xw2, self.b2)
+        xw3 = nn.Linear(res2, self.w3)
+        res3 = nn.AddBias(xw3, self.b3)
+        return res3
 
     def get_loss(self, x, y):
         """
@@ -167,13 +182,23 @@ class DigitClassificationModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        return nn.SoftmaxLoss(self.run(x),y)
 
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
-
+        while dataset.get_validation_accuracy() < 0.975:
+            for x, y in dataset.iterate_once(self.batch_size):
+                loss = self.get_loss(x, y)
+                grad = nn.gradients(loss, [self.w1, self.w2, self.w3, self.b1, self.b2, self.b3])
+                self.w1.update(grad[0], -self.learning_rate)
+                self.w2.update(grad[1], -self.learning_rate)
+                self.w3.update(grad[2], -self.learning_rate)
+                self.b1.update(grad[3], -self.learning_rate)
+                self.b2.update(grad[4], -self.learning_rate)
+                self.b3.update(grad[5], -self.learning_rate)
 
 class LanguageIDModel(object):
     """
