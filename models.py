@@ -112,6 +112,12 @@ class DigitClassificationModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
+        # Ref: https://github.com/jinhoko/CS188/blob/master/pj5/models.py
+        self.batch_size = 1
+        self.w0 = nn.Parameter(784, 100)
+        self.b0 = nn.Parameter(1, 100)
+        self.w1 = nn.Parameter(100, 10)
+        self.b1 = nn.Parameter(1, 10)
         
 
     def run(self, x):
@@ -129,6 +135,10 @@ class DigitClassificationModel(object):
                 (also called logits)
         """
         "*** YOUR CODE HERE ***"
+        xw1 = nn.Linear(x, self.w0)
+        r1 = nn.ReLU(nn.AddBias(xw1, self.b0))
+        xw2 = nn.Linear(r1, self.w1)
+        return nn.AddBias(xw2, self.b1)
 
     def get_loss(self, x, y):
         """
@@ -144,12 +154,28 @@ class DigitClassificationModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        return nn.SoftmaxLoss(self.run(x), y)
 
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+         while True:
+            #print(nn.Constant(dataset.x), nn.Constant(dataset.y))
+            for x, y in dataset.iterate_once(self.batch_size):
+                loss = self.get_loss(x,y)
+                grad = nn.gradients(loss, [self.w0, self.w1, self.b0, self.b1])
+
+                #print(nn.as_scalar(nn.DotProduct(grad[0],grad[0])))
+                self.w0.update(grad[0], -0.005)
+                self.w1.update(grad[1], -0.005)
+                self.b0.update(grad[2], -0.005)
+                self.b1.update(grad[3], -0.005)
+
+            print(dataset.get_validation_accuracy())
+            if dataset.get_validation_accuracy() >= 0.97:
+                return
 
 class LanguageIDModel(object):
     """

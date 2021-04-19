@@ -226,7 +226,7 @@ class DigitClassificationDataset(Dataset):
             self.texts = texts
             self.status = status
             self.last_update = time.time()
-
+python autograder.py -q q3
     def iterate_once(self, batch_size):
         self.epoch += 1
 
