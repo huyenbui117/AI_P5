@@ -112,6 +112,7 @@ class DigitClassificationModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
+        
 
     def run(self, x):
         """
