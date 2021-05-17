@@ -138,9 +138,9 @@ class DigitClassificationModel(object):
         "*** YOUR CODE HERE ***"
         self.w1 = nn.Parameter(784, 100)
         self.b1 = nn.Parameter(1, 100)
-        self.w2 = nn.Parameter(100, 100)
-        self.b2 = nn.Parameter(1, 100)
-        self.w3 = nn.Parameter(100, 10)
+        self.w2 = nn.Parameter(100, 50)
+        self.b2 = nn.Parameter(1, 50)
+        self.w3 = nn.Parameter(50, 10)
         self.b3 = nn.Parameter(1, 10)
         self.learning_rate = 0.05
         self.batch_size = 50
